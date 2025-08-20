@@ -138,7 +138,7 @@ fun ItemDaLista(modifier: Modifier = Modifier) {
                 text = "Suco",
                 style = Typography.bodyMedium,
                 textAlign = TextAlign.Start,
-                modifier = Modifier
+                modifier = Modifier.weight(1f)
             )
             Icone(
                 Icons.Default.Delete,
@@ -157,9 +157,8 @@ fun ItemDaLista(modifier: Modifier = Modifier) {
         }
         Text(
             text = "Segunda-feira (31/10/2025 as 08:30)",
-            style = Typography.labelSmall,
-            textAlign = TextAlign.Start,
-            modifier = modifier
+            Modifier.padding(top = 8.dp),
+            style = Typography.labelSmall
         )
     }
 }
