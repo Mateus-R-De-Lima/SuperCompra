@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.supercompra.ui.theme.SuperCompraTheme
+import com.example.supercompra.ui.theme.Typography
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +32,8 @@ class MainActivity : ComponentActivity() {
             SuperCompraTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                   //ImagemTopo(modifier = Modifier.padding(innerPadding))
-                  Icone(Icons.Default.Add,modifier = Modifier.padding(innerPadding))
+                 // Icone(Icons.Default.Add,modifier = Modifier.padding(innerPadding))
+                  Titulo(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -39,7 +42,11 @@ class MainActivity : ComponentActivity() {
 // Componente
 @Composable
 fun Titulo(modifier: Modifier = Modifier) {
-    Text(text = "Lista de Compras",modifier = modifier)
+    Text(
+        text = "Lista de Compras",
+        modifier = modifier,
+        style = Typography.headlineLarge
+    )
 
 }
 
