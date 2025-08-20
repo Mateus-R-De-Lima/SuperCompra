@@ -5,10 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -18,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -35,7 +38,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             SuperCompraTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        Column {
+                        Column(
+                            verticalArrangement = Arrangement.Top
+
+                        )
+                        {
                             ImagemTopo(modifier = Modifier.padding(innerPadding))
                             Titulo(texto = "Lista de Compras", Modifier.padding(innerPadding))
                             ItemDaLista(modifier = Modifier.padding(innerPadding))
@@ -108,23 +115,53 @@ private fun IconeEditePreview() {
 
 @Composable
 fun ItemDaLista(modifier: Modifier = Modifier) {
-    Row {
-        Checkbox(
-            checked = false,
-            onCheckedChange = {},
-            modifier = modifier.padding(end = 8.dp)
-        )
+
+    Column(
+        verticalArrangement = Arrangement.Top,
+        modifier = modifier
+    )
+    {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+
+            )
+        {
+            Checkbox(
+                checked = false,
+                onCheckedChange = {},
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .size(24.dp)
+            )
+            Text(
+                text = "Suco",
+                style = Typography.bodyMedium,
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+            )
+            Icone(
+                Icons.Default.Delete,
+                Modifier
+                    .padding(end = 8.dp)
+                    .requiredSize(16.dp),
+
+
+                )
+            Icone(
+                Icons.Default.Edit,
+                Modifier
+                    .size(16.dp),
+            )
+
+        }
         Text(
-            text = "Suco",
-            style = Typography.bodyMedium,
-            textAlign = TextAlign.Center,
+            text = "Segunda-feira (31/10/2025 as 08:30)",
+            style = Typography.labelSmall,
+            textAlign = TextAlign.Start,
             modifier = modifier
-
         )
-        Icone(Icons.Default.Delete, modifier.size(16.dp))
-        Icone(Icons.Default.Edit,modifier.size(16.dp))
     }
-
 }
 
 @Preview
