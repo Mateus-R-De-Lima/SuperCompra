@@ -8,8 +8,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
@@ -17,16 +19,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,21 +50,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             SuperCompraTheme {
                 Scaffold(
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 )
                 { innerPadding ->
-                    Column(
-                        verticalArrangement = Arrangement.Top,
-                        modifier = Modifier.padding(innerPadding)
-
-                    )
-                    {
-                        ImagemTopo()
-                        AdicionarItem()
-                        Titulo(texto = "Lista de Compras")
-                        ItemDaLista()
-                        Titulo(texto = "Comprados")
-                    }
+                    ListaDeCompras(Modifier.padding(innerPadding))
 
 
                 }
@@ -69,7 +64,38 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Componente
+// Componentes
+
+@Composable
+fun ListaDeCompras(modifier: Modifier = Modifier) {
+    var listaDeItens by rememberSaveable { mutableStateOf(listOf<ItemCompra>())}
+
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+
+    )
+    {
+        ImagemTopo()
+        AdicionarItem(aoSalvarItem = { textNovo ->
+            listaDeItens = listaDeItens + ItemCompra(textNovo)
+        })
+        Spacer(modifier = Modifier.height(48.dp))
+        Titulo(texto = "Lista de Compras")
+        Column {
+            listaDeItens.forEach {
+                item ->
+                ItemDaLista(item)
+            }
+
+        }
+
+        Titulo(texto = "Comprados")
+    }
+}
+
+data class ItemCompra( var texto: String)
 @Composable
 fun Titulo(texto: String, modifier: Modifier = Modifier) {
     Text(
@@ -126,7 +152,7 @@ private fun IconeEditePreview() {
 }
 
 @Composable
-fun ItemDaLista(modifier: Modifier = Modifier) {
+fun ItemDaLista(itemCompra: ItemCompra,modifier: Modifier = Modifier) {
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -147,7 +173,7 @@ fun ItemDaLista(modifier: Modifier = Modifier) {
                     .size(24.dp)
             )
             Text(
-                text = "Suco",
+                text = itemCompra.texto,
                 style = Typography.bodyMedium,
                 textAlign = TextAlign.Start,
                 modifier = Modifier.weight(1f)
@@ -179,13 +205,13 @@ fun ItemDaLista(modifier: Modifier = Modifier) {
 @Composable
 private fun ItemDaListaPreview() {
     SuperCompraTheme {
-        ItemDaLista()
+        ItemDaLista(ItemCompra("Suco"))
     }
 }
 
 
 @Composable
-fun AdicionarItem(modifier: Modifier = Modifier) {
+fun AdicionarItem(aoSalvarItem: (texto: String) -> Unit, modifier: Modifier = Modifier) {
     var texto = rememberSaveable() { mutableStateOf("") }
 
     OutlinedTextField(
@@ -205,15 +231,37 @@ fun AdicionarItem(modifier: Modifier = Modifier) {
         singleLine = true,
         shape = RoundedCornerShape(24.dp)
     )
+    Button(
+        {
+            aoSalvarItem(texto.value)
+            texto.value = ""
+        },
+        shape = RoundedCornerShape(24.dp),
+        modifier = modifier.padding(16.dp),
+    ) {
+        Text(
+            text = "Salvar Item",
+            color = Color.White,
+            style = Typography.bodyLarge,
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun AdicionarItemPreview() {
     SuperCompraTheme {
-        AdicionarItem()
+        AdicionarItem(aoSalvarItem = {})
     }
 }
+
+
+
+
+
 
 @Preview(showBackground = true)
 @Composable
