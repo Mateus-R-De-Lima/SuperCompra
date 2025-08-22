@@ -1,9 +1,12 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.supercompra
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +32,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,8 +49,12 @@ import com.example.supercompra.ui.theme.Marinho
 import com.example.supercompra.ui.theme.SuperCompraTheme
 import com.example.supercompra.ui.theme.Typography
 import java.text.SimpleDateFormat
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
+
+    val viewModel : SuperComprasViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -58,10 +66,7 @@ class MainActivity : ComponentActivity() {
                         .padding(16.dp)
                 )
                 { innerPadding ->
-                    ListaDeCompras(Modifier.padding(innerPadding))
-
-
-                }
+                    ListaDeCompras(Modifier.padding(innerPadding),viewModel)                }
             }
         }
     }
@@ -70,8 +75,9 @@ class MainActivity : ComponentActivity() {
 // Componentes
 
 @Composable
-fun ListaDeCompras(modifier: Modifier = Modifier) {
-    var listaDeItens by rememberSaveable { mutableStateOf(listOf<ItemCompra>()) }
+fun ListaDeCompras(modifier: Modifier = Modifier, viewModel: SuperComprasViewModel) {
+
+    val listaDeItens by viewModel.listaDeItens.collectAsState()
 
     LazyColumn(
         verticalArrangement = Arrangement.Top,
@@ -83,66 +89,39 @@ fun ListaDeCompras(modifier: Modifier = Modifier) {
         item{
             ImagemTopo()
             AdicionarItem(aoSalvarItem = { novoItem ->
-                listaDeItens = listaDeItens + novoItem
+                viewModel.adionarItem(novoItem)
             })
             Spacer(modifier = Modifier.height(48.dp))
             Titulo(texto = "Lista de Compras")
         }
 
 
-        ListaDeItems(
+        listaDeItems(
             lista = listaDeItens.filter { !it.foiComprado },
             aoMudarStatus = { itemSelecionado ->
-                listaDeItens = listaDeItens.map { itemMap ->
-                    if (itemSelecionado == itemMap) {
-                        itemSelecionado.copy(foiComprado = !itemSelecionado.foiComprado)
-                    } else {
-                        itemMap
-                    }
-                }
+                viewModel.mudarStatus(itemSelecionado)
             },
             aoRemoverItem = { itemRemovido ->
-                listaDeItens = listaDeItens - itemRemovido
+                viewModel.removerItem(itemRemovido)
             },
             aoEditarItem = { itemEditado,textoNovo ->
-                listaDeItens = listaDeItens.map { itemAtual ->
-                    if (itemAtual == itemEditado) {
-                        itemAtual.copy(texto = textoNovo)
-                    } else {
-                        itemAtual
-                    }
-                }
+                viewModel.editarItem(itemEditado,textoNovo)
             },
         )
         item{
             Titulo(texto = "Comprados")
         }
-
-
-
         if (listaDeItens.any { it.foiComprado }) {
-            ListaDeItems(
+            listaDeItems(
                 lista = listaDeItens.filter { it.foiComprado },
                 aoMudarStatus = { itemSelecionado ->
-                    listaDeItens = listaDeItens.map { itemMap ->
-                        if (itemSelecionado == itemMap) {
-                            itemSelecionado.copy(foiComprado = !itemSelecionado.foiComprado)
-                        } else {
-                            itemMap
-                        }
-                    }
+                    viewModel.mudarStatus(itemSelecionado)
                 },
                 aoRemoverItem = { itemRemovido ->
-                    listaDeItens = listaDeItens - itemRemovido
+                    viewModel.removerItem(itemRemovido)
                 },
-                aoEditarItem = { itemEditado, textoNovo ->
-                    listaDeItens = listaDeItens.map { itemAtual ->
-                        if (itemAtual == itemEditado) {
-                            itemAtual.copy(texto = textoNovo)
-                        } else {
-                            itemAtual
-                        }
-                    }
+                aoEditarItem = { itemEditado,textoNovo ->
+                    viewModel.editarItem(itemEditado,textoNovo)
                 },
             )
         }
@@ -152,7 +131,7 @@ fun ListaDeCompras(modifier: Modifier = Modifier) {
 }
 
 
-    fun LazyListScope.ListaDeItems(
+    fun LazyListScope.listaDeItems(
     lista: List<ItemCompra>,
     aoMudarStatus: (item: ItemCompra) -> Unit = {},
     aoRemoverItem: (item: ItemCompra) -> Unit = {},
@@ -383,9 +362,9 @@ fun AdicionarItem(aoSalvarItem: (item: ItemCompra) -> Unit, modifier: Modifier =
 fun getDataHora(): String{
     val dataHora = System.currentTimeMillis()
     val dataHoraFormatado = SimpleDateFormat("EEEE (dd/MM/yyyy) 'às' HH:mm",
-        java.util.Locale("pt", "BR")
+        Locale("pt", "BR")
     )
-    return  dataHoraFormatado.format(dataHora);
+    return  dataHoraFormatado.format(dataHora)
 }
 
 @Preview
