@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,12 +40,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.supercompra.ui.theme.Coral
 import com.example.supercompra.ui.theme.Marinho
 import com.example.supercompra.ui.theme.SuperCompraTheme
 import com.example.supercompra.ui.theme.Typography
@@ -93,8 +97,16 @@ fun ListaDeCompras(modifier: Modifier = Modifier, viewModel: SuperComprasViewMod
             })
             Spacer(modifier = Modifier.height(48.dp))
             Titulo(texto = "Lista de Compras")
+            Spacer(modifier = Modifier.height(24.dp))
         }
-
+        if(listaDeItens.isEmpty()) {
+            item {
+                Text(
+                    text = "Sua lista está vazia. Adicione itens a ela para não esquecer nada na próxima compra!",
+                    style = Typography.bodyLarge
+                )
+            }
+        }
 
         listaDeItems(
             lista = listaDeItens.filter { !it.foiComprado },
@@ -107,11 +119,16 @@ fun ListaDeCompras(modifier: Modifier = Modifier, viewModel: SuperComprasViewMod
             aoEditarItem = { itemEditado,textoNovo ->
                 viewModel.editarItem(itemEditado,textoNovo)
             },
+
         )
-        item{
-            Titulo(texto = "Comprados")
-        }
+
         if (listaDeItens.any { it.foiComprado }) {
+            item{
+                Spacer(modifier = Modifier.height(40.dp))
+                Titulo(texto = "Comprados")
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
             listaDeItems(
                 lista = listaDeItens.filter { it.foiComprado },
                 aoMudarStatus = { itemSelecionado ->
@@ -161,17 +178,31 @@ fun Titulo(texto: String, modifier: Modifier = Modifier) {
     Text(
         text = texto,
         style = Typography.headlineLarge,
-        modifier = modifier,
+        modifier = modifier.padding(bottom = 8.dp).fillMaxWidth(),
+        textAlign = TextAlign.Left
     )
-
+    LinhaPontilhada(modifier = modifier)
 }
 
 @Preview
 @Composable
 private fun TituloPreview() {
-    Titulo(texto = "Lista de Compras")
+    Titulo(texto = " Test Lista de Compras")
 }
 
+@Composable
+fun LinhaPontilhada(modifier: Modifier = Modifier) {
+    val pathEffect = PathEffect.dashPathEffect(floatArrayOf(5f,5f),2.5f)
+    Canvas(modifier = modifier.fillMaxWidth()) {
+        drawLine(
+            color = Coral,
+            pathEffect = pathEffect,
+            start = Offset(0f,0f),
+            end = Offset(size.width,0f),
+            strokeWidth = 4f
+        )
+    }
+}
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
@@ -278,13 +309,13 @@ fun ItemDaLista(
 
             IconButton(
                 onClick = { aoRemoverItem(itemCompra) },
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .size(16.dp)
 
             ) {
                 Icone(
-                    Icons.Default.Delete,
-                    Modifier
-                        .size(16.dp),
+                    Icons.Default.Delete
                 )
             }
 
@@ -292,11 +323,10 @@ fun ItemDaLista(
                 onClick = {
                     edicao = true
                 },
+                modifier = Modifier.size(16.dp)
             ) {
                 Icone(
-                    Icons.Default.Edit,
-                    Modifier
-                        .size(16.dp),
+                    Icons.Default.Edit
                 )
             }
 
