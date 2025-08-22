@@ -14,9 +14,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
@@ -37,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -73,19 +73,22 @@ class MainActivity : ComponentActivity() {
 fun ListaDeCompras(modifier: Modifier = Modifier) {
     var listaDeItens by rememberSaveable { mutableStateOf(listOf<ItemCompra>()) }
 
-    Column(
+    LazyColumn(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
 
     )
     {
-        ImagemTopo()
-        AdicionarItem(aoSalvarItem = { novoItem ->
-            listaDeItens = listaDeItens + novoItem
-        })
-        Spacer(modifier = Modifier.height(48.dp))
-        Titulo(texto = "Lista de Compras")
+        item{
+            ImagemTopo()
+            AdicionarItem(aoSalvarItem = { novoItem ->
+                listaDeItens = listaDeItens + novoItem
+            })
+            Spacer(modifier = Modifier.height(48.dp))
+            Titulo(texto = "Lista de Compras")
+        }
+
 
         ListaDeItems(
             lista = listaDeItens.filter { !it.foiComprado },
@@ -111,8 +114,11 @@ fun ListaDeCompras(modifier: Modifier = Modifier) {
                 }
             },
         )
+        item{
+            Titulo(texto = "Comprados")
+        }
 
-        Titulo(texto = "Comprados")
+
 
         if (listaDeItens.any { it.foiComprado }) {
             ListaDeItems(
@@ -145,25 +151,24 @@ fun ListaDeCompras(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun ListaDeItems(
+
+    fun LazyListScope.ListaDeItems(
     lista: List<ItemCompra>,
     aoMudarStatus: (item: ItemCompra) -> Unit = {},
     aoRemoverItem: (item: ItemCompra) -> Unit = {},
-    aoEditarItem: (item: ItemCompra, textoEditado : String) -> Unit = {_,_ ->},
-    modifier: Modifier = Modifier
+    aoEditarItem: (item: ItemCompra, textoEditado : String) -> Unit = {_,_ ->}
+
 ) {
-    Column(modifier = modifier) {
-        lista.forEach { item ->
+
+    items(lista.size){ index ->
             ItemDaLista(
-                item,
+                lista[index],
                 aoMudarStatus = aoMudarStatus,
                 aoRemoverItem = aoRemoverItem,
                 aoEditarItem = aoEditarItem,
             )
-        }
-
     }
+
 }
 
 data class ItemCompra(
